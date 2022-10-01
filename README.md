@@ -6,7 +6,7 @@ This repo provides a sanitised version of the working ASA configuration, with a 
 
 ## Lab Topology
 
-![](images/az-vwan-asa-vpn.png)
+![](images/az-vwan-asa-vpn-diag.png)
 
 ## Configuration and Notes
 
