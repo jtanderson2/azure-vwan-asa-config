@@ -1,6 +1,6 @@
 # Cisco ASA Configuration - Connecting Resilient VPN to Azure VWAN Hub
 
-This is largely based on [this](https://github.com/jwrightazure/lab/tree/master/asa-vpn-to-active-active-azurevpngw-ikev2-bgp_excellent article byt Jeremey Wright
+This is largely based on [this](https://github.com/jwrightazure/lab/tree/master/asa-vpn-to-active-active-azurevpngw-ikev2-bgp)excellent article byt Jeremey Wright
 
 I collaborated on a deep-dive session with Adam Stuart on this subject, where we delved into options (and caveats!) around using Cisco ASAs to connect to Azure VWAN. The output of that can be found here - https://github.com/adstuart/azure-vwan-asa
 
