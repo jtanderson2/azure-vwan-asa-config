@@ -1,0 +1,146 @@
+ASA Version 9.8(4)22 
+!
+hostname ASA01
+!
+interface GigabitEthernet0/0
+ nameif outside
+ security-level 0
+ ip address 10.1.100.2 255.255.255.0 
+!
+interface GigabitEthernet0/1
+ nameif outside2
+ security-level 0
+ ip address 10.1.101.2 255.255.255.0 
+!
+interface GigabitEthernet0/2
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet0/3
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet0/3.200
+ vlan 200
+ nameif inside
+ security-level 100
+ ip address 10.1.200.1 255.255.255.0 
+!
+interface Tunnel1
+ nameif AZURE-VWAN-VTI1
+ ip address 172.16.1.1 255.255.255.0 
+ tunnel source interface outside
+ tunnel destination <AZ-PIP-1>
+ tunnel mode ipsec ipv4
+ tunnel protection ipsec profile AZURE-VWAN-PROF
+!
+interface Tunnel2
+ nameif AZURE-VWAN-VTI2
+ ip address 172.16.2.1 255.255.255.0 
+ tunnel source interface outside2
+ tunnel destination <AZ-PIP-2>
+ tunnel mode ipsec ipv4
+ tunnel protection ipsec profile AZURE-VWAN-PROF
+!
+access-list INSIDE_IN extended permit ip any any 
+access-list OUTSIDE_IN extended deny ip any any 
+!
+access-group OUTSIDE_IN in interface outside
+access-group INSIDE_IN in interface inside
+!
+prefix-list PL-AZURE-VWAN-IN seq 5 permit 10.39.0.0/24
+!
+prefix-list PL-AZURE-VWAN-OUT seq 5 permit 172.16.1.0/24
+prefix-list PL-AZURE-VWAN-OUT seq 10 permit 172.16.2.0/24
+prefix-list PL-AZURE-VWAN-OUT seq 15 permit 10.1.200.0/24
+!
+!
+route-map RM-AZURE-VWAN-PRI-IN permit 10
+ match ip address prefix-list PL-AZURE-VWAN-IN
+!
+route-map RM-AZURE-VWAN-SEC-IN permit 10
+ match ip address prefix-list PL-AZURE-VWAN-IN
+ set as-path prepend 65100 65100 65100
+!
+route-map RM-AZURE-VWAN-PRI-OUT permit 10
+ match ip address prefix-list PL-AZURE-VWAN-OUT
+!
+route-map RM-AZURE-VWAN-SEC-OUT permit 10
+ match ip address prefix-list PL-AZURE-VWAN-OUT
+ set as-path prepend 65100 65100 65100
+!
+router bgp 65100
+ bgp log-neighbor-changes
+ bgp graceful-restart
+ bgp router-id 172.16.1.1
+ timers bgp 5 15 0
+ address-family ipv4 unicast
+  bgp scan-time 5
+  neighbor 10.16.0.12 remote-as 65515
+  neighbor 10.16.0.12 ebgp-multihop 255
+  neighbor 10.16.0.12 activate
+  neighbor 10.16.0.12 route-map RM-AZURE-VWAN-SEC-IN in
+  neighbor 10.16.0.12 route-map RM-AZURE-VWAN-SEC-OUT out
+  neighbor 10.16.0.13 remote-as 65515
+  neighbor 10.16.0.13 ebgp-multihop 255
+  neighbor 10.16.0.13 activate
+  neighbor 10.16.0.13 route-map RM-AZURE-VWAN-PRI-IN in
+  neighbor 10.16.0.13 route-map RM-AZURE-VWAN-PRI-OUT out
+  network 172.16.1.0 mask 255.255.255.0
+  network 172.16.2.0 mask 255.255.255.0
+  network 10.1.200.0 mask 255.255.255.0
+  no auto-summary
+  no synchronization
+ exit-address-family
+!
+route outside 0.0.0.0 0.0.0.0 10.1.100.1 1
+route outside2 <AZ-PIP-2> 255.255.255.255 10.1.101.1 1
+route management 10.1.255.0 255.255.255.0 10.255.218.1 1
+route AZURE-VWAN-VTI1 10.16.0.13 255.255.255.255 <AZ-PIP-1> 1
+route AZURE-VWAN-VTI2 10.16.0.12 255.255.255.255 <AZ-PIP-2> 1
+!
+crypto ipsec ikev2 ipsec-proposal AZURE-VWAN-PROP
+ protocol esp encryption aes-256 aes-192 aes
+ protocol esp integrity sha-256 sha-1
+crypto ipsec profile AZURE-VWAN-PROF
+ set ikev2 ipsec-proposal AZURE-VWAN-PROP
+ set security-association lifetime kilobytes unlimited
+ set security-association lifetime seconds 3600
+crypto ipsec security-association lifetime seconds 3600
+crypto ipsec security-association lifetime kilobytes unlimited
+crypto ipsec security-association replay disable
+crypto ipsec security-association pmtu-aging infinite
+!
+crypto isakmp disconnect-notify
+crypto ikev2 policy 1
+ encryption aes-256 aes-192 aes
+ integrity sha256 sha
+ group 14
+ prf sha256 sha
+ lifetime seconds 28800
+crypto ikev2 enable outside
+crypto ikev2 enable outside2
+crypto ikev2 notify invalid-selectors
+!
+group-policy AzureGroupPolicy internal
+group-policy AzureGroupPolicy attributes
+ vpn-tunnel-protocol ikev2 l2tp-ipsec 
+!
+tunnel-group <AZ-PIP-1> type ipsec-l2l
+tunnel-group <AZ-PIP-1> general-attributes
+ default-group-policy AzureGroupPolicy
+tunnel-group <AZ-PIP-1> ipsec-attributes
+ ikev2 remote-authentication pre-shared-key *****
+ ikev2 local-authentication pre-shared-key *****
+tunnel-group <AZ-PIP-2> type ipsec-l2l
+tunnel-group <AZ-PIP-2> general-attributes
+ default-group-policy AzureGroupPolicy
+tunnel-group <AZ-PIP-2> ipsec-attributes
+ ikev2 remote-authentication pre-shared-key *****
+ ikev2 local-authentication pre-shared-key *****
+no tunnel-group-map enable peer-ip
+tunnel-group-map default-group <AZ-PIP-1>
+!
+
