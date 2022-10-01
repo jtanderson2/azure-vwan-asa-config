@@ -1,4 +1,4 @@
-# Cisco ASA Configuration - Connecting Resilient VPN to Azure WAN Hub
+# Cisco ASA Configuration - Connecting Resilient VPN to Azure VWAN Hub
 
 Tested Cisco ASA configuration for this lab topology:
 
