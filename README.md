@@ -4,8 +4,10 @@ This is largely based on [this](https://github.com/jwrightazure/lab/tree/master/
 
 This repo provides a sanitised version of the working ASA configuration, with a few extra notes
 
-Tested Cisco ASA configuration for this lab topology:
-
 ## Lab Topology
 
 ![](images/az-vwan-asa-vpn.png)
+
+## Configuration and Notes
+
+Config file in the repo.
