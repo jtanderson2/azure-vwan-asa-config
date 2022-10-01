@@ -97,7 +97,6 @@ router bgp 65100
 !
 route outside 0.0.0.0 0.0.0.0 10.1.100.1 1
 route outside2 <AZ-PIP-2> 255.255.255.255 10.1.101.1 1
-route management 10.1.255.0 255.255.255.0 10.255.218.1 1
 route AZURE-VWAN-VTI1 10.16.0.13 255.255.255.255 <AZ-PIP-1> 1
 route AZURE-VWAN-VTI2 10.16.0.12 255.255.255.255 <AZ-PIP-2> 1
 !
