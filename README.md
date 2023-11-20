@@ -25,7 +25,7 @@ ASA [config file](https://github.com/jtanderson2/azure-vwan-asa-config/blob/main
 
 **Final Thought:**
 
-Perhaps an ASA (or firewall in general) isn't the best device for this kind of solution, not least because it may not be possible to have 2 outside interfaces with distinct public IPs in all environments. If you have to use an ASA and can't provide 2 public IPs, check out the other solution offered up in the [article](https://github.com/adstuart/azure-vwan-asa) I linked to above.
+Perhaps an ASA (or any device that doesn't support loopback interfaces) isn't the best device for this kind of solution, not least because it may not be possible to have 2 outside interfaces with distinct public IPs in all environments. If you have to use an ASA and can't provide 2 public IPs, check out the other solution offered up in the [article](https://github.com/adstuart/azure-vwan-asa) I linked to above.
 
 
 
